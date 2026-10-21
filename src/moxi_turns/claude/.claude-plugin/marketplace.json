@@ -1,0 +1,19 @@
+{
+  "name": "moxi-turns",
+  "description": "turns' Claude Code plugins: the runner and the gate, shipped inside the moxi-turns package",
+  "owner": {
+    "name": "moxi"
+  },
+  "plugins": [
+    {
+      "name": "moxi-turns",
+      "source": "./moxi-turns",
+      "description": "turns' runner: the one way Moxi puts input into a Claude Code session and takes its events out"
+    },
+    {
+      "name": "moxi-turns-gate",
+      "source": "./moxi-turns-gate",
+      "description": "turns' gate: checks a start or a session command where it takes effect"
+    }
+  ]
+}

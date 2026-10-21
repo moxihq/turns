@@ -1,0 +1,7 @@
+{
+  "name": "moxi-turns-gate",
+  "version": "0.1.0",
+  "description": "turns' gate: re-checks a start or a /clear or /exit the moxi-turns runner submitted, where it takes effect, and drops it when the session moved",
+  "author": { "name": "moxi" },
+  "dependencies": ["moxi-turns"]
+}

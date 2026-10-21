@@ -1,0 +1,26 @@
+# turns' config schema: every key a user may set in CONFIG/turns/config.toml.
+# The endpoint reads this file through moxi.config; the Claude runner reads no key.
+
+[commands.allow]
+type = "list"
+default = []
+doc = "Session commands (clear, exit) every session may be asked to run; a launch may add more for itself."
+read = "use"
+
+[claude.endpoint]
+type = "path"
+default = ""
+doc = "The endpoint command the Claude plugin spawns; empty means this environment's moxi-turns-endpoint."
+read = "use"
+
+[hold.wait_ms]
+type = "int"
+default = 2000
+doc = "How long a Stop waits for the session's holder to answer before the turn ends, in milliseconds."
+read = "start"
+
+[listen.wait_ms]
+type = "int"
+default = 2000
+doc = "How long an event waits for the registered listeners to answer, in milliseconds."
+read = "start"

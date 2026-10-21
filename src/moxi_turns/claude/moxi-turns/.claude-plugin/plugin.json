@@ -1,0 +1,7 @@
+{
+  "name": "moxi-turns",
+  "version": "0.1.0",
+  "description": "turns' runner: spawns the session's turns endpoint, reports the session's turns to it, and puts in the deliveries and session commands it hands over",
+  "author": { "name": "moxi" },
+  "types": "./types/index.d.ts"
+}
