@@ -1,4 +1,4 @@
-// moxi-turns, the runner: turns' Claude Code adapter in the session (design §5.7).
+// moxi-turns, the runner: turns' Claude Code adapter in the session.
 //
 // It spawns the session's endpoint (`endpoint.json` beside this plugin names the command),
 // reports the session's main-loop turns to it, puts in what it hands over (a submit, a
@@ -6,7 +6,7 @@
 // runner reads no setting: its bounds are the constants below, and the endpoint's first
 // line carries `hold_wait_ms` and `listen_wait_ms`.
 //
-// The internal leg (§5.2: not the socket contract; it changes only with the package). The
+// The internal leg (not the socket contract; it changes only with the package). The
 // endpoint's half, moxi_turns.claude_leg, states it in full; the runner's part:
 //
 // Endpoint to runner: one JSON object per line on the child's stdout, by `op`:
@@ -43,7 +43,7 @@
 //   /gate/command {request, agents, draft} -> {verdict: pass} | {verdict: drop, reason,
 //   text}; `draft` and `agents` are the gate's readings.
 //
-// RULE (the internal leg): no hook waits on the endpoint longer than a bound this plugin's
+// The internal leg rule: no hook waits on the endpoint longer than a bound this plugin's
 // own timer keeps, and a request that misses its bound counts as unanswered. A reporting
 // hook waits at most 1 s for its report; the Stop ask hold_wait_ms + 1 s; a context ask
 // listen_wait_ms + 1 s; SessionStart waits at most 2 s for the first line.
@@ -55,7 +55,7 @@
 // still go; the endpoint reads the gap in `seq` and fails an open window rather than tie it. When
 // the endpoint has ended the queue is dropped.
 //
-// RULE (the tie, §5.7): each plugin submit has one window, which closes exactly once, at the
+// The tie rule: each plugin submit has one window, which closes exactly once, at the
 // first end the endpoint accepts: resolve (the submit resolved with its prompt entered),
 // drop (it resolved `{ drop }`), fail (it rejected, or is still unsettled at the runner's
 // bound while its prompt is not admitted, or the endpoint ended). The runner reports each
@@ -69,7 +69,7 @@
 // own entry hook for the prompt runs (UserPromptSubmit, which asks the listeners), the
 // bound is raised by that ask's own bound.
 //
-// RULE (entry, §5.7): a runner prompt enters only as the prompt of the window now open,
+// The entry rule: a runner prompt enters only as the prompt of the window now open,
 // admitted once by the endpoint. The runner puts the window nonce on the prompt's first
 // line and keeps the endpoint's mod.sock path in $.state (`endpoint`), written at the
 // first line, at every SessionStart (a /clear empties $.state) and before each submit. The
@@ -77,7 +77,7 @@
 // off on a pass and drops everything else. The gate is required: without it in
 // $.command.list() the runner submits nothing, and the submit closes as `unsupported`.
 //
-// RULE (non-interactive runs): `$.session.surfaces()` empty means headless, read in
+// The non-interactive rule: `$.session.surfaces()` empty means headless, read in
 // whichever of session.start and classic.SessionStart runs first; the first read decides.
 // A headless run spawns no endpoint and every hook returns at once.
 
@@ -114,7 +114,7 @@ type Win = {
   timer: { cancel: () => void } | null
 }
 
-// Module state: a reload starts it over, with a new endpoint (§5.7, the endpoint's life).
+// Module state: a reload starts it over, with a new endpoint.
 let headless: boolean | undefined
 let spawned = false
 let hello: Hello | undefined
@@ -320,7 +320,7 @@ const num = (v: unknown, d: number): number => (typeof v === 'number' && Number.
 
 async function live($: Dollar, askId: unknown): Promise<void> {
   // An unreadable subagent list is unknown, sent as null, which the endpoint counts as
-  // busy: never as 0 (§5.7, idle facts). An unreadable box counts as a draft.
+  // busy: never as 0. An unreadable box counts as a draft.
   let agents: number | null = null
   let draft = true
   try {
@@ -523,7 +523,7 @@ const withContext = <R extends { additionalContext?: string[] }>(r: R, context: 
 
 export const register: Register = on => {
   on('session.start', async ($, e, next) => {
-    // Spawned before `next`, so the endpoint's start overlaps the session's (PB9).
+    // Spawned before `next`, so the endpoint's start overlaps the session's.
     if (!(await isHeadless($))) await spawn($)
     return next(e)
   })

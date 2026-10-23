@@ -1,4 +1,4 @@
-"""The turn ledger: one per endpoint, the one place idle and ran are read from (RULE T3).
+"""The turn ledger: one per endpoint, the one place idle and ran are read from.
 
 The adapter feeds it every main-loop turn start and end with the harness's turn id, and
 says which delivery a turn took (the tie, per harness). `facts()`, a start's
@@ -38,8 +38,8 @@ class Turn:
     delivery_id: str | None = None
     steered: list[str] = field(default_factory=list)
     outcome: str | None = None
-    #: The turn's events wait for a decision about which delivery, if any, it took
-    #: (§5.4 step 2): the ledger has it open or ended, `watch()` has not seen it yet.
+    #: The turn's events wait for a decision about which delivery, if any, it took:
+    #: the ledger has it open or ended, `watch()` has not seen it yet.
     held: bool = False
     #: Whether a held turn's end has been recorded (its `TurnEnded` waits too).
     ended_held: bool = False
@@ -84,7 +84,7 @@ class TurnLedger:
                 held: bool = False) -> tuple[Turn | None, Turn]:
         """A main-loop turn started. Returns `(previous, turn)`: `previous` is a turn left
         open without an end (a missed end), which this closes with outcome `error`.
-        `held`: the turn's events wait for the tie (§5.4 step 2)."""
+        `held`: the turn's events wait for the tie."""
         previous = None
         if self.open is not None:
             previous = self.open

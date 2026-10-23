@@ -1,6 +1,6 @@
 """The caller's side: finding a session's endpoint and speaking the socket protocol to it.
 
-RULE T2: a caller names a session by what it already knows (the harness session id, or a
+A caller names a session by what it already knows (the harness session id, or a
 process id), and turns resolves that to a live endpoint by connecting to it, not by
 trusting a file. An endpoint directory whose socket refuses is swept.
 """
@@ -31,7 +31,7 @@ log = logging.getLogger("moxi.turns.client")
 _ids = itertools.count(1)
 
 #: How long a gate-passed `/exit` may take to end the harness process before it reads
-#: `Failed("not-exited")` (§5.5: 5 s, or twice what PB12 measures if that is longer).
+#: `Failed("not-exited")`.
 EXIT_BOUND_S = 5.0
 #: The reason of a gate-passed `/exit` whose harness process still runs after the bound
 #: (a reload's SIGTERM met it, or the exit was held).
@@ -132,7 +132,7 @@ class Session:
                 timeout: float = 30.0) -> Ran | Refused | Failed:
         """Run `/clear` or `/exit`; `timeout` bounds the wait for the harness to settle it.
 
-        `/exit` reads `Ran` only once the harness process is gone (§5.5): when the
+        `/exit` reads `Ran` only once the harness process is gone: when the
         harness's gate passes it the endpoint answers `passed`, and this watches the
         process `hello` names (a pidfd on Linux, opened before the request so a reused
         pid cannot stand in for it) and answers `Ran` once it has ended, or

@@ -1,4 +1,4 @@
-"""The Claude plugins inside the package (design §5.6, §5.7, §5.10): their layout as a
+"""The Claude plugins inside the package: their layout as a
 folder marketplace, `claude plugin validate` on each, and their own tests under
 `claude plugin test`. The last two need Claude Code on PATH and are skipped without it."""
 

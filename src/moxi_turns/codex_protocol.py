@@ -28,7 +28,7 @@ class AppServerOffline(Exception):
 class NoReply(AppServerOffline):
     """A request went out and no answer came: the connection closed after the send, or
     the wait ran out. Codex may have acted on it, so a delivery it carried is not a
-    refusal (RULE K1). Plain `AppServerOffline` means the request was never sent."""
+    refusal. Plain `AppServerOffline` means the request was never sent."""
 
 
 class CodexError(Exception):

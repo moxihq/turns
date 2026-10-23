@@ -107,7 +107,7 @@ def test_start_refusals(make_endpoint):
 
 
 def test_an_unreadable_subagent_list_is_unknown_and_counts_as_busy(make_endpoint):
-    # §5.7 idle facts; b6-1 [L3]: never 0.
+    # An unknown subagent count never reads as 0.
     env = dict(os.environ, MOXI_TURNS_COMMANDS="clear")
     ep, fake = make_endpoint(env=env)
     s = turns.find(session_id="s-1")
@@ -178,7 +178,7 @@ def test_steer(make_endpoint):
 
 
 def test_a_steering_deliver_racing_a_turn_end_gets_a_new_turn(make_endpoint):
-    """b5-1 [L1]: the turn ends between the caller's deliver(steer=True) and the steer
+    """The turn ends between the caller's deliver(steer=True) and the steer
     taking hold. The text is mail for a new turn, never `idle`."""
     ep, fake = make_endpoint()
     s = turns.find(session_id="s-1")
@@ -381,7 +381,7 @@ def test_a_command_runs_only_from_an_idle_snapshot(make_endpoint):
 
 def test_a_delivery_the_harness_never_settles_expires_and_frees_the_slot(
         make_endpoint, monkeypatch):
-    """b5-1 [L3]: a delivery handed to the adapter that is never tied nor refused answers
+    """A delivery handed to the adapter that is never tied nor refused answers
     `Lost` past the bound, and the endpoint takes the next one."""
     from moxi_turns import endpoint
 
@@ -413,7 +413,7 @@ def test_a_delivery_the_harness_never_settles_expires_and_frees_the_slot(
 
 def test_a_command_the_harness_never_settles_expires_and_frees_the_slot(
         make_endpoint, monkeypatch):
-    """b5-1 [L3]: a command the adapter never settles fails past the bound and frees the
+    """A command the adapter never settles fails past the bound and frees the
     one command slot; the caller who stopped waiting first got `Failed` already."""
     from moxi_turns import endpoint
 

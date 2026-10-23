@@ -1,4 +1,4 @@
-"""The listener group and its asking (§5.11, RULE T5)."""
+"""The listener group and its asking."""
 
 from __future__ import annotations
 

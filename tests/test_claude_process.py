@@ -1,5 +1,5 @@
 """`moxi-turns-endpoint` as a process: its first line, its caller socket once it has the
-session id, and its life (§5.7, RULE): it ends on its own SIGTERM, an EPIPE on its stdout
+session id, and its life: it ends on its own SIGTERM, an EPIPE on its stdout
 or a change of parent, never on anything the runner says, and a hangup or an interrupt
 from a terminal does not end it."""
 

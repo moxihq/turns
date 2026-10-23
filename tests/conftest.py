@@ -48,8 +48,8 @@ def make_endpoint(turns_env):
 @pytest.fixture(autouse=True)
 def claude_root(monkeypatch, tmp_path_factory):
     """Every test sees a folder marketplace of its own, never the package's: a test run in
-    an environment the fleet loads its plugin from must not rewrite that environment's
-    `endpoint.json` (design-records §16.1, M5)."""
+    an environment whose sessions load the plugin must not rewrite that environment's
+    `endpoint.json`."""
     from moxi_turns import claude_setup
 
     root = tmp_path_factory.mktemp("claude")

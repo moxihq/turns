@@ -1,7 +1,8 @@
 [project]
 name = "moxi-turns"
-version = "0.1.0"
+version = "0.1.1"
 description = "Drive a coding-agent session's turns: start, hold, steer and read a turn on any harness."
+readme = "README.md"
 requires-python = ">=3.11"
 license = "MIT"
 authors = [{ name = "CodeManEthan", email = "codemanethan@gmail.com" }]
@@ -18,7 +19,7 @@ Issues = "https://github.com/moxihq/turns/issues"
 # Every Moxi distribution declares the umbrella, so a plain install puts `moxi` on PATH.
 [project.scripts]
 moxi = "moxi.cli:main"
-# Internal entry points, spawned by the Claude runner or a Codex host, never typed (§5.10).
+# Internal entry points, spawned by the Claude runner or a Codex host, never typed.
 moxi-turns-endpoint = "moxi_turns.claude_endpoint:main"
 moxi-turns-ping = "moxi_turns.codex_hooks:main"
 
@@ -39,8 +40,8 @@ packages = ["src/moxi_turns"]
 exclude = ["src/moxi_turns/claude/*/tests"]
 
 [tool.hatch.build.targets.sdist]
-# Paths that are never published stay out of a source distribution built from any branch.
-exclude = ["/CLAUDE.md", "/.public-paths", "/.residue-allow"]
+# A source distribution built from any branch holds the published paths and nothing else.
+only-include = ["contracts/socket-protocol.md", "src/moxi_turns", "tests", "LICENSE", "README.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

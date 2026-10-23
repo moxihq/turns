@@ -1,9 +1,9 @@
-// moxi-turns-gate, the gate (design §5.4 step 4, §5.5, §5.7).
+// moxi-turns-gate, the gate.
 //
 // It acts only on what the moxi-turns runner submitted or queued, and passes everything
 // else untouched: the person's prompts and typed /clear and /exit, other plugins' runs.
 //
-// RULE (entry, §5.7): a runner prompt enters only as the prompt of the window now open,
+// The entry rule: a runner prompt enters only as the prompt of the window now open,
 // admitted once by the endpoint; every other runner prompt is dropped at entry, logged, and
 // never runs. A plugin's submit passes every hook but its own, so this gate's prompt.submit
 // hook sees every runner prompt, told by its origin, as it enters. The runner puts its
@@ -11,7 +11,7 @@
 // endpoint's mod.sock path in $.state (`endpoint`). For each runner prompt the gate reads
 // the prompt box and the subagents and asks the endpoint (POST /gate/entry {nonce, draft,
 // agents}); the endpoint admits it only as the open window's, once, re-checks a start there
-// (§5.4 step 4), and records its answer before it sends it. On a pass the gate takes the
+// against the turn ledger, and records its answer before it sends it. On a pass the gate takes the
 // nonce line off and calls `next({ ...e, text })`, keeping the origin (so the model reads
 // the plugin's frame, not the person's words) and the context. Every other answer is
 // `{ drop: text }` without `next`, so the prompt never enters: the endpoint's line, or the
@@ -20,7 +20,8 @@
 // this hook before `next`. The person sees the one line, the runner reads the reason from
 // it, and the gate logs each drop it decides itself.
 //
-// A session command's re-check (RULE T4). For a /clear or /exit the runner queued (its
+// A session command's re-check, which lets it run only with consent and from an idle
+// snapshot. For a /clear or /exit the runner queued (its
 // `command` mark), the gate reads the subagents and the box, then asks the endpoint
 // (POST /gate/command {request, agents, draft}), which records the decision before the
 // gate passes; a drop, or no answer within 1 s (`gone`), withdraws the run without `next`,
@@ -134,7 +135,7 @@ export const register: Register = on => {
     if (answer === undefined) return gateDrop($, 'the endpoint did not answer within 1 s')
     const line = verdict(answer, dropLine)
     if (line !== null) return { drop: line }
-    // Admitted: the nonce line comes off; the origin and the context stay (§5.7).
+    // Admitted: the nonce line comes off; the origin and the context stay.
     return next({ ...e, text: e.text.slice(nonce[0].length) })
   }).catch(($, e, next) => (next.called || !isRunner(e.origin) ? next(e) : gateDrop($, 'a fault in the hook')))
 

@@ -1,4 +1,4 @@
-// The gate (design §5.4 step 4, §5.5, §5.7): the start's re-check and drop, the session
+// The gate: the start's re-check and drop, the session
 // command's re-check, and everything else passed untouched.
 
 import { describe, expect, mock, test } from 'claude-code/testing'
@@ -148,7 +148,7 @@ describe('entry: every runner prompt is admitted by the endpoint, or dropped', (
     expect(w.entered).toEqual([])
   })
 
-  test('a late prompt (its window closed) is dropped, never entered (PB10)', PLUGINS, async ($: E, on) => {
+  test('a late prompt (its window closed) is dropped, never entered', PLUGINS, async ($: E, on) => {
     const w = world(on)
     await w.boot($)
     await w.mark($, endpointMark)

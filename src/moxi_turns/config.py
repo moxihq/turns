@@ -2,7 +2,7 @@
 
 The schema is `settings.toml` in this package (the announcement's `SETTINGS`). One more
 input sits outside the file: `MOXI_TURNS_COMMANDS`, a launcher's grant of session commands
-to one launch (§5.5), read from the environment the endpoint inherits from its session.
+to one launch, read from the environment the endpoint inherits from its session.
 """
 
 from __future__ import annotations

@@ -236,7 +236,7 @@ def test_l4_the_closure_of_run_is_the_l3_list_and_own_modules():
 
 
 def test_l3_importing_the_kit_loads_no_moxi_and_no_socket():
-    """b5-1 [L2]: the kit shares turns' package, whose `__init__` is the public API. A
+    """The kit shares turns' package, whose `__init__` is the public API. A
     hook process that imports `moxi_turns.hooks` must not load the core or the endpoint's
     client with it: the parent loads empty and its names load on first use."""
     code, out, err = drive(

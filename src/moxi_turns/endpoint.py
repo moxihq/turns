@@ -5,17 +5,17 @@ Codex or OpenCode host). This module is its harness-free core; an adapter
 (`harness.Harness`) supplies the harness half. The core:
 
 - makes the endpoint's directory `RUNTIME/turns/<harness>-<nonce>/` (0700), binds `sock`
-  in it (0600) and writes `hello.json` (§5.3), keyed by the launch's nonce, not the
+  in it (0600) and writes `hello.json`, keyed by the launch's nonce, not the
   session id, so a `/clear` keeps the endpoint and `hello.json` follows the id;
 - answers the socket protocol (`contracts/socket-protocol.md`): `hello`, `facts`,
   `start`, `deliver`, `steer`, `wait`, `command`, `watch`, `hold`;
-- keeps the turn ledger the adapter feeds (§5.4), ties deliveries to turns, holds a
+- keeps the turn ledger the adapter feeds, ties deliveries to turns, holds a
   delivery made while a turn runs until that turn ends, and answers `wait` from the
   ledger alone;
-- checks a session command's consent and its idle snapshot (RULE T4);
-- asks the session's holder at each Stop, bounded by `hold.wait_ms` ([R29]);
+- checks a session command's consent and its idle snapshot;
+- asks the session's holder at each Stop, bounded by `hold.wait_ms`;
 - asks the registered listeners at `ready` and `prompt` and passes back what they
-  answer, and tells them of `turn` and `gone` (§5.11).
+  answer, and tells them of `turn` and `gone`.
 
 turns decides nothing about content or timing: it delivers what it is handed, when it is
 handed it, under the preconditions the caller names.
@@ -55,7 +55,7 @@ from .results import (COMMANDS, OUTCOMES, Ended, Facts, Failed, Gone, Lost, Pass
 
 log = logging.getLogger("moxi.turns.endpoint")
 
-#: One session command accepted per this many seconds ([R31], mod-control as built).
+#: One session command accepted per this many seconds.
 COMMAND_RATE_S = 60.0
 #: How long a `command` waits for the harness to settle it, unless the caller says.
 COMMAND_WAIT_S = 30.0
@@ -63,8 +63,7 @@ COMMAND_WAIT_S = 30.0
 SETTLED_KEPT = 256
 #: How long a delivery or command handed to the adapter may stay unsettled. Past it the
 #: endpoint settles it (a delivery `Lost`, a command `Failed`) and frees its slot, so an
-#: adapter that drops one cannot block the endpoint for its life (mod-control's
-#: `PENDING_TTL_MS` bounds its pending request the same way).
+#: adapter that drops one cannot block the endpoint for its life.
 PENDING_TTL_S = 300.0
 #: The reason an expired delivery or command settles with, and `entering` returns.
 EXPIRED = "expired"
@@ -177,7 +176,7 @@ class Endpoint:
         self._command_inflight: str | None = None
         self._command_accepted_at: float | None = None
         self._watchers: list[_Watcher] = []
-        #: Turns whose events wait for the tie (§5.4 step 2), oldest first.
+        #: Turns whose events wait for the tie, oldest first.
         self._held: list[Turn] = []
         self._attached = False
         self._holder: _Holder | None = None
@@ -238,7 +237,7 @@ class Endpoint:
         with self._lock:
             if self._gone is not None:
                 return
-            # A held turn's window fails with the endpoint (§5.7, the tie's third end):
+            # A held turn's window fails with the endpoint (the tie's third end):
             # its events go out as the person's before `Gone`.
             for turn in list(self._held):
                 self._decide(turn, None)
@@ -325,7 +324,7 @@ class Endpoint:
 
     def identify(self, session_id: str | None, *, ready: str | None = None) -> None:
         """Update the launch's session id. With `ready`, also raise ``Ready`` with that
-        source, and ask no listener: a host's accepted load (RULE T7).
+        source, and ask no listener: a host's accepted load.
 
         A host can learn its id before the harness fires SessionStart. Addressing must
         follow that id at once, while listener context still belongs to the later hook.
@@ -367,11 +366,11 @@ class Endpoint:
 
     def turn_started(self, turn_id: str | None, delivery_id: str | None = None, *,
                      held: bool = False) -> None:
-        """A main-loop turn started. `delivery_id` is the adapter's tie (§5.7): the
+        """A main-loop turn started. `delivery_id` is the adapter's tie: the
         delivery that took this turn, or None for the person's own turn.
 
         `held`: which delivery took the turn is decided only after it started (Claude
-        Code's tie, §5.4 step 2). The ledger opens the turn now, so `facts()` and a
+        Code's tie). The ledger opens the turn now, so `facts()` and a
         start's re-check see it, but its `TurnStarted` (and its `TurnEnded`, if it ends
         first) wait for `turn_tied` or `turn_released`."""
         if held:
@@ -515,7 +514,7 @@ class Endpoint:
             return True
 
     def entering(self, delivery_id: str) -> str | None:
-        """A start is about to take effect: re-check it against the ledger (§5.4 step 4).
+        """A start is about to take effect: re-check it against the ledger.
         A reason refuses it (the delivery answers `Refused`); None lets it in. Any other
         delivery passes untouched."""
         with self._lock:
@@ -598,7 +597,7 @@ class Endpoint:
         return answer if isinstance(answer, str) and answer else None
 
     def command_entering(self, request_id: str) -> str | None:
-        """A session command is about to take effect: the re-check (RULE T4). A reason
+        """A session command is about to take effect: the re-check. A reason
         refuses it."""
         with self._lock:
             c = self._commands.get(request_id)
@@ -662,7 +661,7 @@ class Endpoint:
         `steer` on a harness that can, a running turn takes the text at once."""
         if self.harness.loading():
             # Held at the load gate. A steer-first deliver keeps that intent, so the
-            # accepted load's running turn takes it (RULE T7).
+            # accepted load's running turn takes it.
             d = self._new("deliver", text, fallback=steer and "steer" in self.harness.can)
             with self._lock:
                 call = self._admit(d)
@@ -713,7 +712,7 @@ class Endpoint:
 
     def command(self, name: str, *, if_epoch: int | None = None,
                 timeout: float | None = COMMAND_WAIT_S) -> Ran | Failed | Refused:
-        """Run `/clear` or `/exit` (RULE T4): consented, one in flight, one accepted per
+        """Run `/clear` or `/exit`: consented, one in flight, one accepted per
         60 s, from an idle snapshot with no open turn, no live subagent and no draft."""
         if name not in COMMANDS:
             return Refused("unsupported")
@@ -806,7 +805,7 @@ class Endpoint:
 
     def _snapshot(self) -> tuple[Reading, Live | None, Reading]:
         """The ledger, the live facts, the ledger again: one observation, or two readings
-        that differ (mod-control's snapshot)."""
+        that differ."""
         with self._lock:
             first = self.ledger.read()
         live = self._live()
@@ -903,7 +902,7 @@ class Endpoint:
     def _pump(self) -> None:
         """Hand the next held delivery to the harness, once no turn runs and none is in
         flight. While a turn runs, a steer-first deliver held at the load gate at the head
-        of the queue steers into it (RULE T7), unless that turn is ending: then it waits
+        of the queue steers into it, unless that turn is ending: then it waits
         for the turn's end like any other."""
         while True:
             with self._lock:
@@ -1162,7 +1161,7 @@ class Endpoint:
 
 def _busy(live: Live | None) -> bool:
     """A subagent pending, running or waiting, or a list that could not be read: unknown
-    counts as busy, never as 0 (§5.7, idle facts)."""
+    counts as busy, never as 0."""
     return live is None or live.agents is None or live.agents > 0
 
 

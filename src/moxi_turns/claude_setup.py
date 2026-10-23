@@ -2,13 +2,13 @@
 
 The plugin ships inside the package as a folder marketplace, `moxi_turns/claude/`,
 holding `.claude-plugin/marketplace.json` and two plugins: the runner (`moxi-turns`)
-and the gate (`moxi-turns-gate`) (§5.10, [R28]).
+and the gate (`moxi-turns-gate`).
 
-`SETUP` has two steps (§5.10):
+`SETUP` has two steps:
 
 1. Write `endpoint.json` beside the runner: the absolute endpoint command, which is
    `claude.endpoint` when the key is set and otherwise this environment's
-   `moxi-turns-endpoint` (`moxi.paths.script`, never a PATH lookup, [R19]). Every run
+   `moxi-turns-endpoint` (`moxi.paths.script`, never a PATH lookup). Every run
    rewrites it, so a changed key or a moved environment takes effect at the next
    `moxi install turns`. The file is generated and never tracked.
 2. `claude plugin marketplace add <folder>`, then install both plugins at user scope,
@@ -35,11 +35,11 @@ log = logging.getLogger("moxi.turns.claude")
 MARKETPLACE = "moxi-turns"
 RUNNER = "moxi-turns"
 GATE = "moxi-turns-gate"
-#: The file the runner reads through `${CLAUDE_PLUGIN_ROOT}` (§5.7).
+#: The file the runner reads through `${CLAUDE_PLUGIN_ROOT}`.
 ENDPOINT_FILE = "endpoint.json"
 #: The endpoint's console script.
 ENDPOINT_SCRIPT = "moxi-turns-endpoint"
-#: The Claude Code versions the probes passed on ([R33], `build/probes-b6.md`).
+#: The Claude Code versions the live probes of the plugins passed on.
 PASSED_VERSIONS = ("2.1.296",)
 #: The bound on each `claude` command SETUP and the rows run.
 CLAUDE_TIMEOUT_S = 60.0
@@ -205,7 +205,7 @@ def install_plugins(root: Path | None = None) -> list[str]:
 
 
 def setup() -> int:
-    """turns' `SETUP` (§4.6, §5.10): write `endpoint.json`, then install both plugins.
+    """turns' `SETUP`: write `endpoint.json`, then install both plugins.
     Safe to repeat. Prints what it did; returns 0, or 1 when a step failed."""
     try:
         path = write_endpoint_file()
@@ -228,7 +228,7 @@ def setup() -> int:
 
 
 def rows() -> list:
-    """`check()`'s Claude rows (§5.10): each plugin's presence and version, whether
+    """`check()`'s Claude rows: each plugin's presence and version, whether
     `endpoint.json` names the command the config and the environment give now, and the
     Claude Code version against the ones the probes passed."""
     from .doctor import Row

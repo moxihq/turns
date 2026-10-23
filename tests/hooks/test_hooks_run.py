@@ -1,6 +1,6 @@
 """`guard`, `emit`, `remaining`, `run` — the order, the shapes and the refusals.
 
-The laws these serve have their named gauges in `test_law.py`. What is here is the
+The laws these serve have their named gauges in `test_hooks_law.py`. What is here is the
 behaviour around them: the order inside `run`, the three output shapes, the refusal
 path, and the six `where` tokens reaching `on_error` from the six
 places they name.

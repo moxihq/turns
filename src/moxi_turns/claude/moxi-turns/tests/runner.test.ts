@@ -1,4 +1,4 @@
-// The runner (design §5.7): the non-interactive rule, the internal leg's queue and bounds,
+// The runner: the non-interactive rule, the internal leg's queue and bounds,
 // the tie's window with its three ends and the idle-only bound, the context asks, the Stop
 // ask, and the session commands.
 
@@ -169,7 +169,7 @@ describe('the tie: one window per submit', () => {
     await attached($, w)
     expect(w.stateWrites).toContainEqual({ key: 'endpoint', value: { sock: SOCK } }) // at the first line
     w.settle = async () => {
-      await turnStart($, 't1') // the prompt's own turn.start fires before the resolve (PB1)
+      await turnStart($, 't1') // the prompt's own turn.start fires before the resolve
       return { text: 'x' }
     }
     const n = w.stateWrites.length

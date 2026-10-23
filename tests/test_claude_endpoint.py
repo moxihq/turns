@@ -1,6 +1,6 @@
 """The Claude half of the endpoint, in process: the leg (lines out, HTTP in on `mod.sock`)
 driven by a stand-in runner and gate, and the endpoint's socket driven through the public
-API. The tie's window and its three ends (§5.7), holding, the context asks, `/clear` and
+API. The tie's window and its three ends, holding, the context asks, `/clear` and
 `/exit`, the live facts and the report queue's order."""
 
 from __future__ import annotations
@@ -183,7 +183,7 @@ def test_another_plugin_drop_reads_dropped_and_releases_the_held_turn(claude):
 @pytest.mark.parametrize("code", ["gone", "unsupported"])
 def test_a_drop_the_endpoint_did_not_record_reads_the_plugins_own_code(claude, code):
     # The gate's 1 s timeout or a fault (`gone`), a missing gate (`unsupported`): the
-    # runner reads the code from the drop's line, and the delivery reads it (b6-1 [L2]).
+    # runner reads the code from the drop's line, and the delivery reads it.
     ep, runner = claude()
     s = turns.find(session_id="s-1")
     d = s.start("x")
@@ -426,7 +426,7 @@ def test_a_window_the_runner_never_closes_expires_and_frees_the_next(claude):
     assert runner.next_line()["delivery"] == d2.id
 
 
-# -- entry (§5.7, RULE: a runner prompt enters only as the open window's, admitted once) --
+# -- entry (a runner prompt enters only as the open window's, admitted once) -----------
 
 
 def test_each_window_has_a_random_nonce(claude):
@@ -467,8 +467,8 @@ def test_a_nonce_no_window_of_this_endpoint_names_is_dropped_late(claude):
         d.wait_started(0.1)                      # the open window is untouched
 
 
-def test_pb10_a_prompt_entering_after_the_bound_failed_its_window_is_dropped(claude):
-    # PB10 (d): a /config dialog holds the submit; the bound reports at 5 s, the window
+def test_a_prompt_entering_after_the_bound_failed_its_window_is_dropped(claude):
+    # A /config dialog holds the submit; the bound reports at 5 s, the window
     # fails and reads Lost; when the dialog closes the prompt enters with the closed
     # window's nonce and is dropped, so its text never runs.
     ep, runner = claude()
@@ -487,7 +487,7 @@ def test_pb10_a_prompt_entering_after_the_bound_failed_its_window_is_dropped(cla
     assert drain(events) == []                   # no turn ran
 
 
-def test_pb10_a_start_entering_after_its_window_failed_never_runs_unchecked(claude):
+def test_a_start_entering_after_its_window_failed_never_runs_unchecked(claude):
     ep, runner = claude()
     s = turns.find(session_id="s-1")
     d = s.start("go", if_epoch=0)
@@ -561,7 +561,7 @@ def test_a_lost_report_fails_even_an_admitted_window(claude):
 
 
 def test_an_admitted_window_closes_at_the_core_expiry_and_frees_the_slot(claude):
-    # design-records §20.1 M2: the liveness bound of an admitted window is the core's
+    # The liveness bound of an admitted window is the core's
     # PENDING_TTL_S. At it the window closes, its held turn goes out as the person's,
     # and the next submit is handed over.
     ep, runner = claude()

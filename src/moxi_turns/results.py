@@ -17,12 +17,12 @@ CAPABILITIES = ("start", "steer", "hold", "clear", "exit")
 OUTCOMES = ("answer", "aborted", "error", "refusal")
 
 #: Why a start, deliver or steer was refused (`Refused.reason`). `idle` is steer's alone:
-#: no turn runs to take the text. `dropped`: another plugin's hook dropped the prompt (§5.7).
+#: no turn runs to take the text. `dropped`: another plugin's hook dropped the prompt.
 DELIVERY_REFUSALS = ("busy-turn", "stale-turn", "draft", "busy-agents", "gone",
                      "unsupported", "dropped", "idle", "loading")
 
-#: Why a session command was refused: the delivery reasons it shares, and mod-control's
-#: three for a command (no consent, one already in flight, one accepted in the last 60 s).
+#: Why a session command was refused: the delivery reasons it shares, and three of a
+#: command's own (no consent, one already in flight, one accepted in the last 60 s).
 COMMAND_REFUSALS = ("busy-turn", "stale-turn", "draft", "busy-agents", "gone",
                     "unsupported", "not-allowed", "in-flight", "rate")
 
@@ -95,7 +95,7 @@ class Refused(_Wire):
 
 #: The reason prefix of a `Lost` the endpoint decided while it lived: the delivery's
 #: submit closed with no turn tied to it (a resolve with no turn held, a rejection, the
-#: runner's bound; §5.7, the tie). Any other `Lost` means the endpoint went away.
+#: runner's bound). Any other `Lost` means the endpoint went away.
 LOST_UNTIED = "untied"
 #: The reason prefix of a `Lost` from the endpoint's own bound on an unsettled delivery.
 LOST_EXPIRED = "expired"
@@ -108,7 +108,7 @@ class Lost(_Wire):
     Either the endpoint went away first (a reload, a crash, the session ended), or the
     endpoint lived and the delivery's submit closed with no turn tied to it (reason
     `untied: …`), or the harness neither started nor refused it in time (reason
-    `expired: …`). `untied` tells the two apart (§5.9): True for the last two, where the
+    `expired: …`). `untied` tells the two apart: True for the last two, where the
     endpoint is still there and only this delivery is unaccounted for.
     """
 
@@ -150,7 +150,7 @@ class Failed(_Wire):
 
 @dataclass(frozen=True)
 class Passed(_Wire):
-    """The wire's answer to an `/exit` the harness's gate let through (§5.5). It is not a
+    """The wire's answer to an `/exit` the harness's gate let through. It is not a
     result a caller sees: the library turns it into `Ran` once the harness process is gone,
     or `Failed("not-exited")` when it still runs after the bound."""
 
@@ -215,7 +215,7 @@ class StopFacts(_Wire):
 
 @dataclass(frozen=True)
 class SessionEvent:
-    """What a listener is called with (§5.11): the event and the session's facts.
+    """What a listener is called with: the event and the session's facts.
 
     `event` is `ready`, `prompt`, `turn` or `gone`; `source` is a `ready`'s source;
     `turn_id` and `outcome` are a `turn`'s; `reason` is a `gone`'s. `env` is the session's

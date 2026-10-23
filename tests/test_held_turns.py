@@ -1,4 +1,4 @@
-"""The endpoint core's held turns, driven by the fake harness (§5.4 step 2, §13 [B5]): a
+"""The endpoint core's held turns, driven by the fake harness: a
 turn whose `TurnStarted` and `TurnEnded` wait for a decision made after it opened, while
 the ledger opens and closes it at once."""
 

@@ -29,7 +29,7 @@ MAX_LINE = 4 * 1024 * 1024
 #: The endpoint directory's files.
 SOCK = "sock"
 HELLO = "hello.json"
-#: A Claude endpoint's second socket, its runner's leg (§5.2); no caller uses it.
+#: A Claude endpoint's second socket, its runner's leg; no caller uses it.
 MOD_SOCK = "mod.sock"
 #: The temporary name `hello.json` is written under before it replaces the old one.
 HELLO_TMP = ".hello.json.tmp"

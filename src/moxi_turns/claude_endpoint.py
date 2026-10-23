@@ -1,11 +1,11 @@
 """The Claude Code endpoint: the endpoint core with the Claude half (`ClaudeHarness`).
 
 `moxi-turns-endpoint` runs this. The runner plugin spawns it at `session.start` with the
-absolute path `endpoint.json` names (§5.7); it lives for the session and inherits the
+absolute path `endpoint.json` names; it lives for the session and inherits the
 session's environment. It speaks to its runner over the leg in `claude_leg` and to every
 caller over the endpoint socket (`contracts/socket-protocol.md`).
 
-The tie (§5.7, RULE): each plugin submit has one window, opened when the endpoint hands
+The tie rule: each plugin submit has one window, opened when the endpoint hands
 the runner its `submit` line and closed exactly once, at the first end it accepts: the
 runner's `submit.close` report (`resolve`, `drop` or `fail`), the runner's `submit.bound`
 report while the prompt is not admitted, a report the runner could not deliver, the
@@ -23,7 +23,7 @@ releases the held one as the person's. At the close:
 The endpoint hands the next submit only once the window has closed. The ledger opens and
 closes turns on the reports at once; only the events and the delivery's answers wait.
 
-Entry (§5.7, RULE): a runner prompt enters only as the prompt of the window now open,
+The entry rule: a runner prompt enters only as the prompt of the window now open,
 admitted once by the endpoint. Every other runner prompt is dropped at entry, logged, and
 never runs. The endpoint mints a random window nonce (128 bits) at each hand-over, the
 runner puts it on the prompt's first line, and the gate asks `/gate/entry` with it for
@@ -32,7 +32,7 @@ window and that window has admitted nothing; for a start it re-checks there. Adm
 and the bound's fail are both decided here, under one lock, in the order the gate's ask
 and the runner's report arrive, so no window is both admitted and failed by the bound.
 
-An admitted window's liveness bound (design-records §20.1 M2): from admission the 5 s
+An admitted window's liveness bound: from admission the 5 s
 bound no longer fails it. It closes at its submit's settle, by a report the runner could
 not deliver, at the endpoint's end, or at the core's expiry, `PENDING_TTL_S` (300 s) from
 the hand-over, when the delivery reads `Lost('expired: …')` and the window closes and frees
@@ -40,7 +40,7 @@ the slot. A settings hook that hangs, a modal opened between the gate's pass and
 entry, or a Claude Code fault can hold an admitted window that long; nothing is lost, and
 a caller that will not wait that long frees itself with its own `wait_*` timeout.
 
-The endpoint's life (§5.7, RULE): it ends on its own SIGTERM, an EPIPE on its stdout, or
+The endpoint's life, a rule: it ends on its own SIGTERM, an EPIPE on its stdout, or
 a change of parent, and never on a `session.end` hook. It takes its session id from the
 runner on every load, and opens its caller socket (answers `hello`) once it has the id.
 """
@@ -79,11 +79,11 @@ CLOSED_KEPT = 64
 
 @dataclass
 class _Window:
-    """One plugin submit's window (§5.7)."""
+    """One plugin submit's window."""
 
     delivery: str
     kind: str
-    #: The window nonce: random, 128 bits, minted at the hand-over (§5.7, entry).
+    #: The window nonce: random, 128 bits, minted at the hand-over.
     nonce: str = field(default_factory=lambda: secrets.token_hex(16))
     #: The endpoint admitted the window's prompt (`/gate/entry` passed it). From here the
     #: runner's bound no longer fails the window.
@@ -184,7 +184,7 @@ class ClaudeHarness(Harness):
             raise OSError(f"the runner could not read the live facts: {answer['error']}")
         agents, draft = answer.get("agents"), answer.get("draft")
         # `agents` null: the runner could not list the subagents. Unknown, which counts
-        # as busy and never reads as 0 (§5.7, idle facts; b6-1 [L3]).
+        # as busy and never reads as 0.
         if (isinstance(agents, bool) or not (agents is None or isinstance(agents, int))
                 or not isinstance(draft, bool)):
             raise OSError(f"the runner's live answer is malformed: {answer!r}")
@@ -233,7 +233,7 @@ class ClaudeHarness(Harness):
                 self._close(leg.END_FAIL, "the runner's line is closed")
 
     def _close(self, end: str, reason: str | None) -> None:
-        """Under the lock: the open window closes by `end` (§5.7)."""
+        """Under the lock: the open window closes by `end`."""
         w, self._window = self._window, None
         if w is None:
             return
@@ -253,7 +253,7 @@ class ClaudeHarness(Harness):
             if end == leg.END_DROP:
                 # The reason the endpoint recorded stands; else the plugins' own code
                 # (the gate's `gone`, the runner's `unsupported`); else another plugin's
-                # drop, `dropped` (§5.7).
+                # drop, `dropped`.
                 refused_by_gate = w.delivery in self._gate_refused
                 if not refused_by_gate:
                     ep.refused(w.delivery, reason if reason in leg.GATE_CODES
@@ -357,7 +357,7 @@ class ClaudeHarness(Harness):
         raise leg.BadRequest(f"unknown context event {event!r}")
 
     def _gate_entry(self, body: dict[str, Any]) -> dict[str, Any]:
-        """The gate asks for a runner prompt as it enters (§5.7, entry). Under the lock
+        """The gate asks for a runner prompt as it enters. Under the lock
         that applies the runner's reports, so the ask and the bound's report are decided
         in the order they arrive. The answer is recorded before it is sent."""
         nonce = body.get("nonce")
@@ -415,7 +415,7 @@ class ClaudeHarness(Harness):
             return {"verdict": "drop", "reason": reason,
                     "text": f"moxi-turns-gate: /{request.name if request else '?'} was "
                             f"refused ({reason})"}
-        # The decision is recorded before the gate passes it (§5.5).
+        # The decision is recorded before the gate passes it.
         if request.name == "exit":
             ep.command_settled(request.id, Passed())
         else:
@@ -560,7 +560,7 @@ def main(argv: list[str] | None = None) -> int:
     logging.basicConfig(stream=sys.stderr, level=logging.INFO,
                         format="moxi-turns-endpoint[%(process)d] %(levelname)s %(message)s")
     life = Life()
-    # Only the three ends count (§5.7): a terminal's interrupt or hangup is not one.
+    # Only the three ends count: a terminal's interrupt or hangup is not one.
     signal.signal(signal.SIGINT, signal.SIG_IGN)
     signal.signal(signal.SIGHUP, signal.SIG_IGN)
     signal.signal(signal.SIGTERM, lambda *_: life.end("SIGTERM: Claude Code ended the "
@@ -591,7 +591,7 @@ def main(argv: list[str] | None = None) -> int:
         return 2
     life.watch_parent(ppid)
     harness.first_line()
-    # Callers find the endpoint only once it has its session id (§5.7).
+    # Callers find the endpoint only once it has its session id.
     life.wait(harness.session_known)
     if not life.ended.is_set():
         try:

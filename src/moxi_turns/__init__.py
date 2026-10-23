@@ -24,7 +24,7 @@ out of the harness. This package is turns' whole public API, the announcement's
     turns.check()             # rows for a doctor
     turns.claude_plugin_dirs()  # the Claude plugin folders, for a per-launch --plugin-dir
     s = turns.opencode.launch(cwd, *, instructions=None, env=None, options=None)
-                              # an OpenCode host, experimental (§5.7)
+                              # an OpenCode host, experimental
 
 The wire under it is turns' socket protocol, `contracts/socket-protocol.md`.
 

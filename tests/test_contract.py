@@ -17,7 +17,7 @@ def test_the_repo_keeps_the_module_contract():
 
 
 def test_every_public_name_loads_on_first_use():
-    """The package loads its names lazily (b5-1 [L2]); each one in `__all__` resolves to
+    """The package loads its names lazily; each one in `__all__` resolves to
     the object its submodule defines (a host's namespace, named as its submodule, is
     the submodule), and an unknown name is an AttributeError."""
     import importlib

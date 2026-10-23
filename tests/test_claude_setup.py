@@ -1,6 +1,6 @@
-"""turns' SETUP in its two steps, `claude_plugin_dirs()`, and the Claude doctor rows
-(§5.10). `claude` is a stand-in on PATH; no test runs the real one, and none writes the
-package's own `endpoint.json` (conftest's `claude_root`, design-records §16.1 M5)."""
+"""turns' SETUP in its two steps, `claude_plugin_dirs()`, and the Claude doctor rows.
+`claude` is a stand-in on PATH; no test runs the real one, and none writes the
+package's own `endpoint.json` (conftest's `claude_root`)."""
 
 from __future__ import annotations
 

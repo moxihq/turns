@@ -1,4 +1,4 @@
-"""The OpenCode host (experimental, §5.7) on a fake server: options by RULE T6, posting
+"""The OpenCode host (experimental) on a fake server: options laid on unread, posting
 only into an idle session, the tie by the reply's parent, outcomes, and supervision."""
 
 from __future__ import annotations
@@ -117,7 +117,7 @@ def host(turns_env, tmp_path):
         h.endpoint.stop("the test ended")
 
 
-# -- RULE T6 -------------------------------------------------------------------------------
+# -- options: laid on unread, a key turns owns refused -------------------------------------
 
 @pytest.mark.parametrize("options,error", [
     ({"instructions": ["x.md"]}, ValueError),

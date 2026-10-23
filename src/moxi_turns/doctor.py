@@ -1,4 +1,4 @@
-"""`turns.check()`: rows for a doctor (§5.10). turns has no command of its own; comms'
+"""`turns.check()`: rows for a doctor. turns has no command of its own; comms'
 doctor calls this to answer "can comms reach this session?".
 
 The rows this release gives: turns' config, the registered listeners, and the live

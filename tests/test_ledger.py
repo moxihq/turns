@@ -21,7 +21,7 @@ def test_the_ledger():
 
 
 def test_an_ending_turn_stays_open_and_takes_no_steer():
-    # RULE K1's ending form: Codex was told the turn may end. It is still open (a start
+    # The ending form: Codex was told the turn may end. It is still open (a start
     # is still refused busy, held mail still waits) but no steer goes into it.
     led = TurnLedger("s-1")
     _, turn = led.started("t1", "d1")

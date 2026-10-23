@@ -1,4 +1,4 @@
-"""The listener group: modules registered with turns for session events (§5.11, RULE T5).
+"""The listener group: modules registered with turns for session events.
 
 A module registers by declaring an entry point in the group `moxi.turns.listeners`,
 named by the module, whose target is a stdlib-only module holding `LISTENERS`:

@@ -32,7 +32,7 @@ class HookHarness(FakeHarness):
                          stop_hook_active=frame.get("stop_hook_active"), crons=0)
 
     def settle_turn(self, turn_id, outcome):
-        # No hook closes a turn (RULE K1); a call here is a failure the tests look for.
+        # No hook closes a turn; a call here is a failure the tests look for.
         self.settled.append((turn_id, outcome))
         self.endpoint.turn_ended(turn_id, outcome)
 

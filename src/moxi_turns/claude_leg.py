@@ -1,7 +1,7 @@
 """The Claude endpoint's leg to its own runner: turns' internal protocol, not the contract.
 
 The runner (the `moxi-turns` plugin) spawns the endpoint at `session.start` with
-`$.process.spawn`. The two talk over two channels (§5.2, §5.7):
+`$.process.spawn`. The two talk over two channels:
 
 - **Endpoint to runner: JSON lines on the endpoint's stdout**, one object per line, each
   with an `"op"`. The child's stdin is a fixed string, so nothing comes back that way.
@@ -87,7 +87,7 @@ open (`block`), null lets it end. The endpoint answers within `hold.wait_ms`.
 answers within `listen.wait_ms`.
 
 `/gate/entry` — `{nonce, draft, agents}` from the gate, for every runner prompt as it
-enters (§5.7, entry). `nonce` is the window nonce the gate read off the prompt's first
+enters. `nonce` is the window nonce the gate read off the prompt's first
 line; `draft` (bool) and `agents` (int, or true when the list could not be read) are the
 gate's readings. The endpoint admits the prompt only if the nonce names the window now
 open and that window has admitted nothing yet; for a start it then re-checks the ledger
@@ -138,7 +138,7 @@ R_APPEND_FAILED, R_COMMAND_DONE = "append.failed", "command.done"
 REPORTS = (R_SESSION, R_TURN_START, R_TURN_COMPLETE, R_SUBMIT_CLOSE, R_SUBMIT_BOUND,
            R_APPEND_FAILED, R_COMMAND_DONE)
 
-#: A submit window's three ends (§5.7, the tie).
+#: A submit window's three ends.
 END_RESOLVE, END_DROP, END_FAIL = "resolve", "drop", "fail"
 ENDS = (END_RESOLVE, END_DROP, END_FAIL)
 
@@ -146,7 +146,7 @@ ENDS = (END_RESOLVE, END_DROP, END_FAIL)
 #: gate's `gone` (no answer within its 1 s, no `mod.sock` path, a fault in its hook) and
 #: the runner's `unsupported` (the gate is not loaded, so nothing was submitted). A drop
 #: whose reason is one of these reads `Refused` with it; any other drop the endpoint did
-#: not record reads `dropped`, another plugin's (§5.7).
+#: not record reads `dropped`, another plugin's.
 GATE_CODES = ("gone", "unsupported")
 
 #: The first line of every runner prompt is this prefix and the window nonce; the gate

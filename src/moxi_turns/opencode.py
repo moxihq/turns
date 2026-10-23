@@ -1,4 +1,4 @@
-"""Launch an OpenCode session behind a turns endpoint. Experimental, as in comms (§5.7).
+"""Launch an OpenCode session behind a turns endpoint. Experimental, as in comms.
 
 ``launch`` owns one `opencode serve` (`opencode_server`) on loopback with a per-launch
 password, one OpenCode session it creates, and that server's event stream. The host is
@@ -10,7 +10,7 @@ immediately before each post (a 200 whose JSON has no entry for the session, or 
 that says idle). OpenCode has one loop per session: a prompt posted while a turn runs is
 taken at that turn's next step, and the running turn's own reply is never written. So
 `can` holds no `steer`, and the core holds a `deliver` made during a turn until it ends.
-That status read is where a start takes effect (§5.4 step 4): the ledger re-check
+That status read is where a start takes effect: the ledger re-check
 (`entering`) runs first, then the status read, and a busy session refuses the start
 `busy-turn`. A deliver that meets a busy session waits for the next idle and is posted
 then. OpenCode has no Stop to hold and no session command.
@@ -37,10 +37,9 @@ messages, each on comms' backoff (0.5 s doubling to
 30 s, 20 % jitter, reset by a success). While no stream is open and reconciled, a
 handed delivery waits in the host and goes in once it is; the core's `PENDING_TTL_S`
 bounds the wait. A post the server refuses in a way a retry cannot fix (a 4xx) refuses
-that delivery `gone` and ends the endpoint with the server's answer, as comms closes
-the launch today.
+that delivery `gone` and ends the endpoint with the server's answer.
 
-**Options** (RULE T6). `options` is OpenCode's config object. The host lays it, unread,
+**Options**. `options` is OpenCode's config object. The host lays it, unread,
 into the server's `OPENCODE_CONFIG_CONTENT` at every server start, a restart's included.
 turns owns `instructions`: the host writes the `instructions` text to a file in the
 endpoint's directory and names it there, so a mapping that names `instructions` is
@@ -77,12 +76,12 @@ from .results import Failed
 
 log = logging.getLogger("moxi.turns.opencode")
 
-#: The host is experimental (§5.7), as comms' OpenCode launcher is.
+#: The host is experimental, as comms' OpenCode launcher is.
 EXPERIMENTAL = True
 BINARY = "opencode"
 #: Where OpenCode's installer puts the binary when it is not on PATH.
 INSTALL_DIR = Path("~/.opencode/bin")
-#: The top-level config keys turns owns (RULE T6).
+#: The top-level config keys turns owns.
 OWNED_OPTIONS = frozenset({"instructions"})
 #: The server environment variables turns owns.
 OWNED_ENV = frozenset({"OPENCODE_SERVER_PASSWORD", "OPENCODE_CONFIG_CONTENT"})

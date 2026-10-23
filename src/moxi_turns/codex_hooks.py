@@ -4,7 +4,7 @@ Hook commands carry their socket path on the command line because Codex runs the
 the session's saved environment. SessionStart and UserPromptSubmit return listener text
 through ``moxi_turns.hooks``. Stop uses a two-phase block: the ping flushes the block to
 stdout and acknowledges that write. No hook closes a turn: Stop and Interrupt are Codex
-asking or telling, and the turn ends on Codex's own word (RULE K1, in ``codex``). A
+asking or telling, and the turn ends on Codex's own word (see ``codex``). A
 Stop answered unblocked marks the turn ending, so it takes no more steers.
 """
 
@@ -253,13 +253,13 @@ class HookServer:
         if event in ("SessionStart", "PostCompact"):
             source = frame.get("source")
             source = source if isinstance(source, str) else None
-            # The accepted load raised this start's or resume's Ready (RULE T7).
+            # The accepted load raised this start's or resume's Ready.
             loaded = event == "SessionStart" and source in ("startup", "resume")
             context = endpoint.ready(source, self.harness.session_id, announce=not loaded)
             return {"ok": True, "context": context}
         if event == "UserPromptSubmit":
             return {"ok": True, "context": endpoint.prompt()}
-        # A hook answers what it is asked and closes no turn (RULE K1). Stop is Codex
+        # A hook answers what it is asked and closes no turn. Stop is Codex
         # asking whether the turn may end: the turn runs on until Codex's own
         # turn/completed, which carries the outcome (`interrupted` for Esc).
         if event == "Interrupt":
@@ -276,8 +276,8 @@ class HookServer:
                 pass
             return None
         # Unblocked: once Codex reads this answer it may complete the turn at once, and
-        # a steer it takes then can be written into the turn and never answered (the B2
-        # probe). The turn is marked ending before the answer goes out ([R12]).
+        # a steer it takes then can be written into the turn and never answered. The
+        # turn is marked ending before the answer goes out.
         self.harness.stop_answered(facts.turn_id)
         return {"ok": True}
 

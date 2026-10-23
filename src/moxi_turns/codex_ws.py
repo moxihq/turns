@@ -133,7 +133,7 @@ class AppServerClient:
         with self._cv:
             while rid not in self._pending:
                 # From here the request is out: a raise is NoReply, since Codex may
-                # have acted on it (RULE K1). Before the send it is AppServerOffline.
+                # have acted on it. Before the send it is AppServerOffline.
                 if self._closed:
                     raise NoReply("Codex app-server closed the connection")
                 remaining = deadline - time.monotonic()

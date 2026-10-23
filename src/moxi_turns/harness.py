@@ -1,6 +1,6 @@
 """What an adapter gives the endpoint core: the harness half of an endpoint.
 
-One adapter per harness (§5.7): the Claude Code endpoint half, the Codex host, the
+One adapter per harness: the Claude Code endpoint half, the Codex host, the
 OpenCode host. The endpoint core (`endpoint.Endpoint`) owns the socket, the turn ledger,
 the deliveries, the holder and the listeners; the adapter owns the harness. They meet
 here.
@@ -46,7 +46,7 @@ endpoint's adapter-side calls:
     endpoint.turn_ended(turn_id, outcome) the open main-loop turn ended
     endpoint.entering(delivery_id) -> str | None
                                           a start is about to take effect: the ledger
-                                          re-check (§5.4 step 4); a reason refuses it
+                                          re-check; a reason refuses it
     endpoint.refused(delivery_id, reason) the adapter refused a delivery it was handed
     endpoint.steer_missed(delivery_id)     a steer raced the turn's end; detach it from
                                            that turn and take the ordinary deliver path
@@ -88,7 +88,7 @@ class Live:
     waiting, or is None when the harness could not list them; `draft` says the person has
     typed into the prompt box (an adapter that cannot read the box says True).
 
-    RULE (§5.7, idle facts): an unreadable subagent list is unknown, and unknown counts as
+    Rule: an unreadable subagent list is unknown, and unknown counts as
     busy. It never reads as 0: `facts().agents` is None, a start that asked for the
     subagent refusal refuses `busy-agents`, and a session command refuses `busy-agents`."""
 

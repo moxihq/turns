@@ -60,7 +60,7 @@ def test_initialize_requests_and_notifications_share_one_connection(tmp_path):
 
 
 def test_a_call_says_whether_its_request_went_out(tmp_path):
-    # RULE K1: a request never sent (not connected, the send raised) raises plain
+    # A request never sent (not connected, the send raised) raises plain
     # AppServerOffline; one sent and never answered (the connection closed after the
     # send, or the wait ran out) raises NoReply, its subclass; an error answer raises
     # CodexError.

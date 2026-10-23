@@ -5,7 +5,7 @@ window. The app-server link reconnects and resumes the same thread after a conne
 or child failure. Calls into the endpoint settle every submitted delivery; steering is
 best effort because the endpoint has already tied it to the turn that was open.
 
-RULE K1: a turn is open in the ledger from its start until Codex says it is over:
+A turn is open in the ledger from its start until Codex says it is over:
 ``turn/completed``; a ``thread/status/changed`` to a non-active status with no
 ``turn/completed`` within ``TURN_COMPLETED_GRACE``; a load whose answer shows it gone; or
 a dead app-server. No hook closes a turn. A delivery reads ``Refused`` only when Codex
@@ -13,7 +13,7 @@ did not take its text (the request was never sent, or Codex answered it with an 
 once the request went out it reads ``Started`` on a turn the host has just learned of,
 or ``Lost("untied: ...")`` at once.
 
-The ending form ([R12]): once a Stop is answered unblocked, Codex may complete the turn
+The ending form: once a Stop is answered unblocked, Codex may complete the turn
 at any moment, and a steer it takes in that gap can be written into the turn and never
 answered. So the turn is marked ending: it stays open, but no ``turn/steer`` for it goes
 out after the Stop answer. A steer-first delivery waits and starts a new turn after
@@ -250,7 +250,7 @@ class CodexHarness(Harness):
         if reason is None or reason == "":
             return None
         if not isinstance(reason, str):
-            # verify is typed str | None (RULE T6); any other answer fails closed.
+            # verify is typed str | None; any other answer fails closed.
             raise _VerifyFailed(
                 f"Codex load verification returned {type(reason).__name__}, not a reason"
             )
@@ -363,7 +363,7 @@ class CodexHarness(Harness):
                     self.active_turn_id = turn_id
                     if active:
                         # The load shows Codex running: a status backstop timer set
-                        # before the reconnect no longer speaks for it (RULE K1).
+                        # before the reconnect no longer speaks for it.
                         self._cancel_grace()
                     generation.thread_id = thread_id
                     published = True
@@ -375,14 +375,14 @@ class CodexHarness(Harness):
                 if starting:
                     # Every fresh thread is primed, window or not: until its first turn
                     # it has no rollout, and `thread/resume` refuses it. The priming turn
-                    # belongs to the load, as in today's launcher: a refusal fails it,
+                    # belongs to the load: a refusal fails it,
                     # and a windowed launch waits until it is accepted.
                     self._start_turn(PRIMING_TEXT, None)
                 else:
                     generation.ready.set()
                 self._priming = False
                 # Only an accepted load raises Ready, so it follows the priming turn: a
-                # refused priming turn fails the load and raises none (RULE T7).
+                # refused priming turn fails the load and raises none.
                 self.endpoint.identify(thread_id, ready="startup" if starting else "resume")
                 self._accepted.set()
                 if old_turn and old_turn != turn_id:
@@ -397,14 +397,14 @@ class CodexHarness(Harness):
                 if turn_id and turn_id not in self._reported_turns:
                     # A list naming an in-progress turn the host has not reported: it
                     # ties a delivery whose turn/start Codex answered and whose
-                    # turn/started was lost with the connection (RULE K1, [L1]).
+                    # turn/started was lost with the connection.
                     self._report_started(turn_id, None, claim=True, answered_only=True)
                 self.endpoint.load_changed()
             except BaseException as exc:
                 if self._priming:
                     # A refused priming turn leaves a thread with no rollout, which
                     # `thread/resume` refuses for good. Forget it, so the retry starts a
-                    # new thread, as after any failed start (RULE T7); its accepted load
+                    # new thread, as after any failed start; its accepted load
                     # names the new id to the endpoint and in its Ready.
                     with self._lock:
                         if self.session_id == thread_id:
@@ -413,7 +413,7 @@ class CodexHarness(Harness):
                 if generation is not None:
                     generation.ended.set()
                 if ws is not None:
-                    # A failed load closes its connection, published or not (RULE T7):
+                    # A failed load closes its connection, published or not:
                     # a refused priming turn fails the load after publication.
                     with self._lock:
                         if self.ws is ws:
@@ -600,7 +600,7 @@ class CodexHarness(Harness):
                 turn_id = self._started_turn
                 # A delivery counts as started only once a report claimed it. A turn a
                 # reconnect's load reported before turn/start answered wakes the wait
-                # without a claim ([L1]); the list below decides that case.
+                # without a claim; the list below decides that case.
                 tied = delivery_id is None or self._pending_delivery != delivery_id
             if tied:
                 if claimed and claimed != turn_id:
@@ -624,9 +624,10 @@ class CodexHarness(Harness):
         with self._lock:
             if self._pending_delivery == delivery_id:
                 # Untied. The list named no turn, or one already reported: reporting
-                # it again would close it as `error` in the endpoint. Under RULE K1 the
-                # second happens only when the ledger closed a turn Codex still runs
-                # (the status backstop misfiring); either way the caller reads lost.
+                # it again would close it as `error` in the endpoint. Since only Codex
+                # ends a turn, the second happens only when the ledger closed a turn
+                # Codex still runs (the status backstop misfiring); either way the
+                # caller reads lost.
                 self._pending_delivery = None
                 return None
             # A turn/started came after the wait and tied the delivery.
@@ -678,7 +679,7 @@ class CodexHarness(Harness):
                         and self.active_turn_id not in self._settled_turns):
                     # Codex says the thread is idle while the ledger holds a turn open.
                     # Its turn/completed normally follows; if none comes within the
-                    # grace, the turn ends `error` (RULE K1's backstop).
+                    # grace, the turn ends `error` (the status backstop).
                     turn_id = self.active_turn_id
                     timer = threading.Timer(TURN_COMPLETED_GRACE, self._grace_expired,
                                             args=(turn_id,))
@@ -733,7 +734,7 @@ class CodexHarness(Harness):
         out: Codex may complete the turn at any moment after it. Mark the turn ending
         here and in the ledger, so no steer for it goes out from now on, and let a
         ``turn/steer`` already sent be answered first, so it reaches Codex before the
-        Stop answer does. The turn stays open until Codex ends it (RULE K1)."""
+        Stop answer does. The turn stays open until Codex ends it."""
         with self._lock:
             turn = turn_id or self.active_turn_id
             if (turn is None or turn != self.active_turn_id

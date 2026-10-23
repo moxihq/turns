@@ -374,7 +374,7 @@ def test_fresh_window_primes_before_releasing_a_gated_delivery(turns_env):
 
 
 def test_a_headless_start_primes_its_fresh_thread_and_a_resume_does_not(turns_env):
-    # B14 [L51]: a fresh thread has no rollout until its first turn, and `thread/resume`
+    # A fresh thread has no rollout until its first turn, and `thread/resume`
     # refuses it, so a thread launched without a window is primed too.
     endpoint, harness, first = _host(turns_env)
     try:
@@ -466,7 +466,7 @@ def test_phantom_turn_start_id_is_never_reported(monkeypatch, turns_env):
     session = Session(endpoint.dir, endpoint.hello())
     try:
         # The request went out and Codex answered it, so the text may be in: not a
-        # refusal (RULE K1). Nothing names a turn to tie it to, so it reads lost at once.
+        # refusal. Nothing names a turn to tie it to, so it reads lost at once.
         delivery = session.start("hello")
         started = delivery.wait_started(1)
         assert isinstance(started, Lost) and started.untied
@@ -602,7 +602,7 @@ def test_headless_first_failure_returns_and_retries_until_accepted(turns_env):
 
 
 def test_headless_first_accepted_load_after_a_failure_names_the_thread_in_ready(turns_env):
-    # B14 [L50]: a no-window launch returns once its first load was tried. When that load
+    # A no-window launch returns once its first load was tried. When that load
     # failed, the caller has no thread id; the first accepted load gives it in `Ready`.
     harness = None
     attempts = 0
@@ -814,7 +814,7 @@ def test_a_refused_priming_turn_closes_its_candidate_and_retries(turns_env):
 
 
 def test_a_delivery_made_during_the_priming_turn_waits_at_the_gate(turns_env):
-    # [L23]: the priming turn is part of the load, so the gate stays shut while it runs.
+    # The priming turn is part of the load, so the gate stays shut while it runs.
     # A delivery made then is not handed to the candidate; it starts on the next load.
     harness = None
     made = []
@@ -901,8 +901,8 @@ def test_accepted_start_and_resume_each_raise_one_ready(turns_env):
 
 
 def test_a_refused_priming_turn_raises_no_ready(turns_env):
-    # [L24]: only an accepted load raises Ready, and a refused priming turn fails the
-    # start. [L30]: the refused thread has no rollout, so `thread/resume` would refuse it
+    # Only an accepted load raises Ready, and a refused priming turn fails the
+    # start. The refused thread has no rollout, so `thread/resume` would refuse it
     # for good; the retry starts a new thread instead. The first thread's id, already
     # named by `identify`, is abandoned, and the launch's one Ready names the new one.
     harness = None
@@ -972,7 +972,7 @@ def test_a_non_string_verify_answer_fails_the_load(turns_env, answer):
 def test_gate_held_steer_goes_into_a_different_turn_the_load_shows(turns_env):
     # The accepted resume shows a running turn other than the one the ledger holds.
     # The old turn ends `error`, and nothing held at the gate is started as a new turn
-    # in between: the steer-first delivery goes into the turn the load shows (RULE T7).
+    # in between: the steer-first delivery goes into the turn the load shows.
     harness = None
     made = []
     hold, release = threading.Event(), threading.Event()
@@ -1020,7 +1020,7 @@ def test_gate_held_steer_goes_into_a_different_turn_the_load_shows(turns_env):
         endpoint.stop("the test ended")
 
 
-# -- RULE K1: a Codex turn closes only on Codex's own word ---------------------------
+# -- A Codex turn closes only on Codex's own word ------------------------------------
 
 
 def _hook(monkeypatch, harness, event, turn_id):
@@ -1040,11 +1040,11 @@ def _hook(monkeypatch, harness, event, turn_id):
 
 def test_a_steer_after_an_unblocked_stop_starts_a_new_turn_after_the_completion(
         monkeypatch, turns_env):
-    # Finding 2 (2026-10-20): Stop is Codex asking whether the turn may end, not its end,
-    # so the ledger keeps the turn open until turn/completed. The B2 live probe showed
-    # Codex taking a steer in the last ms before turn/completed and never answering it,
-    # so after an unblocked Stop the turn is ending ([R12], design §3.4): a steer-first
-    # delivery waits and starts a new turn once Codex completes this one.
+    # Stop is Codex asking whether the turn may end, not its end, so the ledger keeps
+    # the turn open until turn/completed. A live probe showed Codex taking a steer in
+    # the last ms before turn/completed and never answering it, so after an unblocked
+    # Stop the turn is ending: a steer-first delivery waits and starts a new turn once
+    # Codex completes this one.
     monkeypatch.setattr(codex_module, "TURN_STARTED_WAIT", 0.01)
     endpoint, harness, app = _host(turns_env)
     session = Session(endpoint.dir, endpoint.hello())
@@ -1163,7 +1163,7 @@ def test_the_stop_answer_waits_for_a_steer_codex_has_not_yet_answered(
         monkeypatch, turns_env):
     # A turn/steer already on its way when the hold answers Stop must reach Codex
     # before the Stop answer does: Codex then takes it inside the hook, before its end
-    # check, and answers it (probe trials 5 and 6). None may land in the gap after.
+    # check, and answers it. None may land in the gap after.
     endpoint, harness, app = _host(turns_env)
     session = Session(endpoint.dir, endpoint.hello())
     first = session.start("first")
@@ -1396,7 +1396,7 @@ def test_a_raising_turn_steer_reads_refused_only_when_codex_did_not_take_it(
 
 def test_a_raising_turns_list_after_an_absorbed_start_reads_lost(monkeypatch, turns_env):
     # Once turn/start has answered, Codex has the text: a raise from the later
-    # thread/turns/list call is not a refusal either (re-check 2, minor 1).
+    # thread/turns/list call is not a refusal either.
     endpoint, harness, app = _host(turns_env)
     original = app.call
 
@@ -1462,7 +1462,7 @@ def test_a_load_that_shows_the_turn_running_stops_the_grace(monkeypatch, turns_e
 
 def test_noreply_after_turn_started_claimed_the_delivery_leaves_it_on_that_turn(
         turns_env):
-    # [L2]: turn/started reaches the host and claims the delivery, then the connection
+    # turn/started reaches the host and claims the delivery, then the connection
     # closes before turn/start's answer. Codex named the turn that took the text, so the
     # delivery stays Started on it and ends with it; NoReply does not make it Lost.
     endpoint, harness, app = _host(turns_env)
@@ -1522,10 +1522,10 @@ def _reconnecting_host(turns_env, first_client):
 
 def test_a_reconnect_inside_the_started_wait_ties_the_delivery_to_the_turn_it_shows(
         monkeypatch, turns_env):
-    # [L1], the verifier's reproduction: turn/start is answered, its turn/started is
+    # turn/start is answered, its turn/started is
     # lost with the connection, and the reconnect's load shows the turn that took the
     # text running. That load is a list naming an in-progress turn the host has not
-    # reported, so it ties the delivery (RULE K1); nothing waits for PENDING_TTL_S.
+    # reported, so it ties the delivery; nothing waits for PENDING_TTL_S.
     monkeypatch.setattr(codex_module, "TURN_STARTED_WAIT", 3.0)
     sent = threading.Event()
 
@@ -1556,7 +1556,7 @@ def test_a_reconnect_inside_the_started_wait_ties_the_delivery_to_the_turn_it_sh
 
 def test_a_turn_a_load_reports_before_turn_start_answers_does_not_count_as_its_start(
         monkeypatch, turns_env):
-    # [L1], the other order: the reconnect's load reports the running turn before
+    # The other order: the reconnect's load reports the running turn before
     # turn/start has answered, so it cannot claim the delivery, and its report wakes the
     # wait. _start_turn checks the claim and takes the list path: the turn is already
     # reported, so the delivery reads lost at once instead of waiting in flight.
